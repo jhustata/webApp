@@ -126,6 +126,6 @@ function calculateDonorRisk(predonationCreatinine, gender, BMI, age, height, hyp
 
   console.log(expectedeGFRcr)
 
-  document.getElementById("predicted-creatinine-result").innerText = predictedCreatinine.toFixed(4)
-  document.getElementById("expected-eGFRcr-result").innerText = expectedeGFRcr.toFixed(4)
+  document.getElementById("predicted-creatinine-result").innerText = predictedCreatinine.toFixed(2)
+  document.getElementById("expected-eGFRcr-result").innerText = expectedeGFRcr.toFixed(0)
 }
