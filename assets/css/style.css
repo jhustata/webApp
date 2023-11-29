@@ -693,7 +693,7 @@ header {
 
 .form-field-button {
   margin-bottom: 16px;
-  display: flex;
+  display: flex !important;
   justify-content: center;
   border: none;
   color: white;
@@ -703,13 +703,14 @@ header {
   font-size: 16px;
   margin: 10px 0px 20px;
   cursor: pointer;
-  background-color: rgb(16, 128, 97);
-  border-radius: 5px;
+  justify-content: flex-start;
 }
 
 .submit-button {
+  border-radius: 5px;
   padding: 10px 40px;
   color: #ffffff;
+  background-color: rgb(16, 128, 97);
 }
 
 .select-field-label {
