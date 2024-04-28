@@ -1,3 +1,2 @@
-- Assets
-- JScript
-- ?
+```
+webApp > master > assets > js > script.js
