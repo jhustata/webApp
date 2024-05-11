@@ -1,142 +1,37 @@
-# 1
-
-To adapt the existing calculator template for your needs, we'll need to make several changes. Here's a basic outline of the steps:
-
-1. **Read CSV Files:** Use JavaScript to read the `s0_nondonor.csv`, `b_nondonor.csv`, and `SV_nondonor.csv` files.
-2. **Calculate Hazard Ratio (HR):** Calculate the hazard ratio comparing the given scenario to the base case using the formula `log HR = SV_nondonor * b_nondonor'`.
-3. **Calculate Cumulative Incidence:** Calculate the cumulative incidence using the formula `f1_nondonor = f0_nondonor * exp(HR[1,1])`, where `f0_nondonor = (1 - s0_nondonor) * 100`.
-4. **Update UI:** Update the user interface to display the calculated cumulative incidence curve.
-
-Here's a simplified version of how you might start modifying the existing script to achieve this:
+To add the functionality for calculating the 30-year risk of mortality based on user input (age, sex, and race) using the provided coefficient vector `beta` and survival function `s0`, you can modify the existing script. Here's the updated script:
 
 ```javascript
-let s0_nondonor; // Assume this variable holds the survival function from 0 to 1
-let b_nondonor; // Assume this variable holds the beta coefficients from Cox regression
-let SV_nondonor; // Assume this variable holds the scenario vector
+'use strict';
 
-// Function to read CSV files
-function readCSVFiles() {
-  // Use appropriate methods to read CSV files and store data in s0_nondonor, b_nondonor, and SV_nondonor variables
+// Existing code...
+
+function calculateMortalityRisk() {
+  // Scenario vector X: (40, 1, 1, 0, 0) - 40yo, male, white, not black, not hispanic
+  const scenarioVector = [40, 1, 1, 0, 0];
+  const beta = [1.1, 0.4, 0, 1.79, -0.05];
+  const s0 = [0.99, 0.93, 0.86, 0.77, 0.71, 0.64, 0.56];
+  const timePoints = [0, 5, 10, 15, 20, 25, 30];
+
+  // Calculate log hazard ratio
+  const logHR = beta.reduce((acc, curr, index) => acc + (curr * scenarioVector[index]), 0);
+
+  // Calculate hazard ratio
+  const HR = Math.exp(logHR);
+
+  // Calculate risk over time for the scenario
+  const f0 = s0.map(s => (1 - s) * 100);
+  const f1 = f0.map((f, index) => f * Math.exp(logHR));
+
+  // Display the 30-year risk of mortality at time points 0, 5, 10, 15, 20, 25, 30
+  const riskResults = timePoints.map((time, index) => `Risk at ${time} years: ${f1[index].toFixed(2)}%`);
+  console.log(riskResults.join('\n'));
 }
 
-// Calculate Hazard Ratio (HR)
-function calculateHR() {
-  // Calculate the hazard ratio comparing the given scenario to the base case
-  // HR = exp(SV_nondonor * b_nondonor')
-}
+// Existing code...
 
-// Calculate Cumulative Incidence
-function calculateCumulativeIncidence() {
-  // Calculate f0_nondonor
-  const f0_nondonor = (1 - s0_nondonor) * 100;
+// Add an event listener for the "Calculate Mortality Risk" button
+document.getElementById("calculate-risk-button").addEventListener("click", calculateMortalityRisk);
 
-  // Calculate f1_nondonor = f0_nondonor * exp(HR[1,1])
-  const f1_nondonor = f0_nondonor * Math.exp(HR[1, 1]);
-
-  // Update UI to display f1_nondonor as the cumulative incidence curve
-}
-
-// Function to handle form submission
-function onSubmit(event) {
-  event.preventDefault();
-
-  readCSVFiles();
-  calculateHR();
-  calculateCumulativeIncidence();
-}
-
-// Add event listener to form submission
-document.getElementById("myForm").addEventListener("submit", onSubmit);
 ```
 
-This is a basic outline, and you'll need to fill in the details for reading CSV files and calculating the HR and cumulative incidence based on your specific data and requirements. Additionally, you'll need to update the UI to display the calculated cumulative incidence curve.
-
-# 2
-
-Certainly! Here's a complete JavaScript script that includes everything, from reading the CSV files to calculating the hazard ratio and cumulative incidence. This script assumes you're using the Fetch API to load CSV files and a hypothetical `updateUI` function to update the user interface with the calculated cumulative incidence.
-
-```javascript
-let s0_nondonor; // Assume this variable holds the survival function from 0 to 1
-let b_nondonor; // Assume this variable holds the beta coefficients from Cox regression
-let SV_nondonor; // Assume this variable holds the scenario vector
-
-// Read CSV files and extract relevant data
-function readCSVFiles() {
-  Promise.all([
-    fetch('path/to/s0_nondonor.csv').then(response => response.text()),
-    fetch('path/to/b_nondonor.csv').then(response => response.text()),
-    fetch('path/to/SV_nondonor.csv').then(response => response.text())
-  ]).then(([s0_nondonor_csv, b_nondonor_csv, SV_nondonor_csv]) => {
-    // Parse CSV data
-    s0_nondonor = parseCSV(s0_nondonor_csv);
-    b_nondonor = parseCSV(b_nondonor_csv);
-    SV_nondonor = parseCSV(SV_nondonor_csv);
-
-    // Assuming s0_nondonor contains _d, _t, and s0_nondonor values
-    // Extract these values from SV_nondonor as needed
-
-    // Assuming b_nondonor contains the beta coefficients
-    // Extract these coefficients as needed
-
-    // Calculate cumulative incidence
-    calculateCumulativeIncidence();
-  }).catch(error => {
-    console.error('Error loading CSV files:', error);
-  });
-}
-
-// Calculate Hazard Ratio (HR)
-function calculateHR() {
-  // Transpose b_nondonor
-  let b_transpose = transposeMatrix(b_nondonor);
-
-  // Calculate HR as the exponential of the dot product of SV_nondonor and b_nondonor
-  let HR = 0;
-  for (let i = 0; i < SV_nondonor.length; i++) {
-    HR += SV_nondonor[i] * b_transpose[i];
-  }
-  HR = Math.exp(HR);
-  return HR;
-}
-
-// Calculate Cumulative Incidence
-function calculateCumulativeIncidence() {
-  // Calculate f0_nondonor
-  const f0_nondonor = (1 - s0_nondonor) * 100;
-
-  // Calculate HR
-  const HR = calculateHR();
-
-  // Calculate f1_nondonor = f0_nondonor * HR
-  const f1_nondonor = f0_nondonor * HR;
-
-  // Update UI to display f1_nondonor as the cumulative incidence curve
-  updateUI(f1_nondonor);
-}
-
-// Function to transpose a matrix
-function transposeMatrix(matrix) {
-  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
-}
-
-// Function to parse CSV data into an array of arrays
-function parseCSV(csv) {
-  return csv.split('\n').map(row => row.split(','));
-}
-
-// Example function to update the UI with the calculated cumulative incidence
-function updateUI(cumulativeIncidence) {
-  console.log('Cumulative Incidence:', cumulativeIncidence);
-}
-
-// Function to handle form submission
-function onSubmit(event) {
-  event.preventDefault();
-  readCSVFiles();
-}
-
-// Add event listener to form submission
-document.getElementById("myForm").addEventListener("submit", onSubmit);
-```
-
-Replace `'path/to/s0_nondonor.csv'`, `'path/to/b_nondonor.csv'`, and `'path/to/SV_nondonor.csv'` with the actual paths to your CSV files. The `updateUI` function is a placeholder for updating the user interface with the calculated cumulative incidence. You may need to replace it with your actual UI update logic.
+This script calculates the log hazard ratio based on the scenario vector `X` and the coefficient vector `beta`. It then calculates the hazard ratio `HR` and uses the survival function `s0` to calculate the risk of mortality over time `f1`. Finally, it logs the 30-year risk of mortality at the specified time points. You can add this to the existing JavaScript to complete the functionality.
