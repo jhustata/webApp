@@ -5,9 +5,9 @@ let SV_nondonor; // Assume this variable holds the scenario vector
 // Read CSV files and extract relevant data
 function readCSVFiles() {
   Promise.all([
-    fetch('path/to/s0_nondonor.csv').then(response => response.text()),
-    fetch('path/to/b_nondonor.csv').then(response => response.text()),
-    fetch('path/to/SV_nondonor.csv').then(response => response.text())
+    fetch('s0_nondonor.csv').then(response => response.text()),
+    fetch('b_nondonor.csv').then(response => response.text()),
+    fetch('SV_nondonor.csv').then(response => response.text())
   ]).then(([s0_nondonor_csv, b_nondonor_csv, SV_nondonor_csv]) => {
     // Parse CSV data
     s0_nondonor = parseCSV(s0_nondonor_csv);
