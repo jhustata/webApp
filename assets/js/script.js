@@ -124,8 +124,37 @@ function calculateDonorRisk(predonationCreatinine, gender, BMI, age, height, hyp
   const ageCoefficient = Math.pow(0.9938, age) * eGFRcrCoefficient;
   const expectedeGFRcr = constant * powerMin * powerMax * ageCoefficient
 
+//from GPT
+function calculateMortalityRisk() {
+  // Scenario vector X: (40, 1, 1, 0, 0) - 40yo, male, white, not black, not hispanic
+  const scenarioVector = [40, 1, 1, 0, 0];
+  const beta = [1.1, 0.4, 0, 1.79, -0.05];
+  const s0 = [0.99, 0.93, 0.86, 0.77, 0.71, 0.64, 0.56];
+  const timePoints = [0, 5, 10, 15, 20, 25, 30];
+
+  // Calculate log hazard ratio
+  const logHR = beta.reduce((acc, curr, index) => acc + (curr * scenarioVector[index]), 0);
+
+  // Calculate hazard ratio
+  const HR = Math.exp(logHR);
+
+  // Calculate risk over time for the scenario
+  const f0 = s0.map(s => (1 - s) * 100);
+  const f1 = f0.map((f, index) => f * Math.exp(logHR));
+
+  // Display the 30-year risk of mortality at time points 0, 5, 10, 15, 20, 25, 30
+  const riskResults = timePoints.map((time, index) => `Risk at ${time} years: ${f1[index].toFixed(2)}%`);
+  console.log(riskResults.join('\n'));
+}
   console.log(expectedeGFRcr)
 
   document.getElementById("predicted-creatinine-result").innerText = predictedCreatinine.toFixed(2)
   document.getElementById("expected-eGFRcr-result").innerText = expectedeGFRcr.toFixed(0)
+  // Add an event listener for the "Calculate Mortality Risk" button
+  document.getElementById("calculate-risk-button").addEventListener("click", calculateMortalityRisk);
 }
+
+
+ 
+
+ 
