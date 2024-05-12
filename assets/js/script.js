@@ -34,33 +34,6 @@ function footerDescription(type) {
   }
 }
 
-// function validateInput(input) {
-//   // document.getElementById("gfg").
-//   var bmi = document.getElementById("bmi");
-//   var errorMessageElement = document.getElementById("error-message");
-//   if (input.value > 40) {
-//     errorMessageElement.textContent = 'Value should be between 15 to 40';
-//     bmi.setCustomValidity('Value should be between 15 to 40');o
-//   } else if (input.value < 15) {
-//     errorMessageElement.textContent = 'Value should be between 15 to 40';
-//     bmi.setCustomValidity('Value should be between 15 to 40');o
-//   } else {
-//     errorMessageElement.textContent = '';
-//     bmi.setCustomValidity('');
-//   }
-//   // if (input.value > 40) {
-//   //   input.value = 40;
-//   // } else if (input.value < 15) {
-//   //   input.value = 15
-//   // } else {
-//   //   input.value = input.value;
-
-//   // if (input.value === '') {
-//   //   input.value = '';
-//   // }
-//   console.log(input.value)
-// }
-
 function setActiveHypertension(type) {
   hypertension = type
   var buttons = document.querySelectorAll('.hypertension a');
@@ -70,9 +43,7 @@ function setActiveHypertension(type) {
   document.querySelector('.button-' + type).classList.add('active');
 }
 
-
-function onSubmit (event) {
-  // event.preventDefault();
+function onSubmit(event) {
   var form = document.getElementById("myForm");
   if (form.checkValidity()) {
     document.getElementById("expected-eGFRcr").style.display = 'block'
@@ -88,14 +59,6 @@ function onSubmit (event) {
   var creatinine = Number(document.getElementById("creatinine").value);
   var bmi = Number(document.getElementById("bmi").value);
   var height = Number(document.getElementById("height").value);
-  // var patient = {
-  //   gender: gender,
-  //   hypertension: hypertension,
-  //   age: age,
-  //   creatinine: creatinine,
-  //   bmi: bmi,
-  //   height: height
-  // };
 
   calculateDonorRisk(creatinine, gender, bmi, age, height, hypertension);
 }
@@ -108,8 +71,8 @@ function calculateDonorRisk(predonationCreatinine, gender, BMI, age, height, hyp
   const BMI30Term = BMI > 30 ? 1 : 0;
   const age55Term = age > 55 ? 1 : 0;
 
-  const predictedCreatinine  =
-      0.0600344 + ((0.8191583 + (-0.3593172 * maleCoefficient)) * predonationCreatinine) + ((0.1311153 + (0.4733182 * maleCoefficient)) *(predonationCreatinine - 0.7) * predonationCreatinineCoefficientSeven) + (-0.1581432*(predonationCreatinine - 0.9) * predonationCreatinineCoefficientNine) + 0.3429115 * maleCoefficient + 0.0034174 * BMI + (-0.0025009 * (BMI - 30 ) * BMI30Term) + (0.0024177 * age) + (-0.0007185 * (age - 55) * age55Term) + (0.12903 * height) + (0.0074556 * hypertensionCoefficient)
+  const predictedCreatinine =
+    0.0600344 + ((0.8191583 + (-0.3593172 * maleCoefficient)) * predonationCreatinine) + ((0.1311153 + (0.4733182 * maleCoefficient)) * (predonationCreatinine - 0.7) * predonationCreatinineCoefficientSeven) + (-0.1581432 * (predonationCreatinine - 0.9) * predonationCreatinineCoefficientNine) + 0.3429115 * maleCoefficient + 0.0034174 * BMI + (-0.0025009 * (BMI - 30) * BMI30Term) + (0.0024177 * age) + (-0.0007185 * (age - 55) * age55Term) + (0.12903 * height) + (0.0074556 * hypertensionCoefficient)
 
   console.log(predictedCreatinine)
 
@@ -124,37 +87,32 @@ function calculateDonorRisk(predonationCreatinine, gender, BMI, age, height, hyp
   const ageCoefficient = Math.pow(0.9938, age) * eGFRcrCoefficient;
   const expectedeGFRcr = constant * powerMin * powerMax * ageCoefficient
 
-//from GPT
-function calculateMortalityRisk() {
-  // Scenario vector X: (40, 1, 1, 0, 0) - 40yo, male, white, not black, not hispanic
-  const scenarioVector = [40, 1, 1, 0, 0];
-  const beta = [1.1, 0.4, 0, 1.79, -0.05];
-  const s0 = [0.99, 0.93, 0.86, 0.77, 0.71, 0.64, 0.56];
-  const timePoints = [0, 5, 10, 15, 20, 25, 30];
-
-  // Calculate log hazard ratio
-  const logHR = beta.reduce((acc, curr, index) => acc + (curr * scenarioVector[index]), 0);
-
-  // Calculate hazard ratio
-  const HR = Math.exp(logHR);
-
-  // Calculate risk over time for the scenario
-  const f0 = s0.map(s => (1 - s) * 100);
-  const f1 = f0.map((f, index) => f * Math.exp(logHR));
-
-  // Display the 30-year risk of mortality at time points 0, 5, 10, 15, 20, 25, 30
-  const riskResults = timePoints.map((time, index) => `Risk at ${time} years: ${f1[index].toFixed(2)}%`);
-  console.log(riskResults.join('\n'));
-}
   console.log(expectedeGFRcr)
 
   document.getElementById("predicted-creatinine-result").innerText = predictedCreatinine.toFixed(2)
   document.getElementById("expected-eGFRcr-result").innerText = expectedeGFRcr.toFixed(0)
-  // Add an event listener for the "Calculate Mortality Risk" button
-  document.getElementById("calculate-risk-button").addEventListener("click", calculateMortalityRisk);
 }
 
+function calculateMortalityRisk() {
+  // Scenario vector X: (40, 1, 1, 0, 0) - 40yo, male, white, not black, not hispanic
+  const age = Number(document.getElementById("age").value);
+  const sex = document.querySelector('.gender a.active').getAttribute('data-value');
+  const race = document.getElementById("race").value;
 
- 
+  const scenarioVector = [age, sex === 'male' ? 1 : 0, race === 'white' ? 1 : 0, race === 'black' ? 1 : 0, race === 'hispanic' ? 1 : 0];
+  const beta = [1.1, 0.4, 0, 1.79, -0.05];
+  const s0 = [0.99, 0.93, 0.86, 0.77, 0.71, 0.64, 0.56];
+  const timePoints = [0, 5, 10, 15, 20, 25, 30];
 
- 
+  const logHR = beta.reduce((acc, curr, index) => acc + (curr * scenarioVector[index]), 0);
+  const HR = Math.exp(logHR);
+
+  const f0 = s0.map(s => (1 - s) * 100);
+  const f1 = f0.map((f, index) => f * Math.exp(logHR));
+
+  const riskResults = timePoints.map((time, index) => `Risk at ${time} years: ${f1[index].toFixed(2)}%`);
+  console.log(riskResults.join('\n'));
+}
+
+document.getElementById("calculate-risk-button").addEventListener("click", calculateMortalityRisk);
+
