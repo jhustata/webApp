@@ -24,10 +24,10 @@
   </nav>
 
   <div class="menu">
-    <a href="#" class="menu-item">Age</a>
-    <a href="#" class="menu-item">Gender</a>
-    <a href="#" class="menu-item">Race</a>
-    <a href="#" class="menu-item">Calculator</a>
+    <a href="#" class="menu-item" onclick="alert('Age')">Age</a>
+    <a href="#" class="menu-item" onclick="alert('Gender')">Gender</a>
+    <a href="#" class="menu-item" onclick="alert('Race')">Race</a>
+    <a href="#" class="menu-item" onclick="alert('Calculator')">Calculator</a>
   </div>
 
   <main>
@@ -123,7 +123,7 @@
 
       <section class="mortality-risk">
         <h3 class="h3">Calculate Mortality Risk</h3>
-        <button id="calculate-risk-button">Calculate</button>
+        <button id="calculate-risk-button" onclick="calculateMortalityRisk()">Calculate</button>
         <pre id="mortality-risk-results"></pre>
       </section>
     </div>
