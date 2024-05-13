@@ -120,8 +120,7 @@
 
           <p class="model-insights-description" id="model-insights-description">
             This model is intended for adult individuals considering living kidney donation. It provides a predicted
-            6-month post-donation serum creatinine and an expected eGFR calculated based on the predicted serum
-            creatinine using the race-free creatinine-based equation (CKD-EPI 2021).
+            6-month post-donation serum creatinine and an expected eGFR calculated based on the predicted serum creatinine using the race-free creatinine-based equation (CKD-EPI 2021).
             <br>
             <br>
             The population used for this study included adult individuals considering living kidney donation.
@@ -138,6 +137,17 @@
 
       <section class="mortality-risk">
         <h3 class="h3">Calculate Mortality Risk</h3>
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            Select Scenario
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="#" onclick="selectScenario('donors')">Living Donors</a></li>
+            <li><a class="dropdown-item" href="#" onclick="selectScenario('nondonors')">Healthy Nondonors</a></li>
+            <li><a class="dropdown-item" href="#" onclick="selectScenario('general')">General Population</a></li>
+          </ul>
+        </div>
         <button id="calculate-risk-button" onclick="calculateMortalityRisk()">Calculate</button>
         <pre id="mortality-risk-results"></pre>
       </section>
@@ -156,6 +166,7 @@
     var gender = 'male';
     var race = 'white';
     var hypertension = 'noMedication';
+    var scenarioVector = [1, 0, 0]; // Default to living donors scenario
 
     function setActiveGender(type) {
       gender = type;
@@ -182,6 +193,22 @@
         buttons[i].classList.remove('active');
       }
       document.querySelector('.button-' + type).classList.add('active');
+    }
+
+    function selectScenario(scenario) {
+      switch (scenario) {
+        case 'donors':
+          scenarioVector = [1, 0, 0];
+          break;
+        case 'nondonors':
+          scenarioVector = [0, 1, 0];
+          break;
+        case 'general':
+          scenarioVector = [0, 0, 1];
+          break;
+        default:
+          scenarioVector = [1, 0, 0];
+      }
     }
 
     function onSubmit(event) {
@@ -231,42 +258,30 @@
     }
 
     function calculateMortalityRisk() {
-      const scenarioVector = [40, gender === 'male' ? 1 : 0, race === 'white' ? 1 : 0, race === 'black' ? 0 : 1, race === 'hispanic' ? 0 : 1];
-      const beta = [1.1, 0.4, 0, 1.79, -0.05];
-      const s0 = [0.99, 0.93, 0.86, 0.77, 0.71, 0.64, 0.56];
-      const timePoints = [0, 5, 10, 15, 20, 25, 30];
+      const beta = [0.2067, 0.3812, 0.5399];
+      const age = 50;
+      let mortalityRisk = 1 - Math.exp(-Math.exp(beta[0] + beta[1] * Math.log(age) + beta[2] * Math.log(age) * Math.log(age)));
 
-      const logHR = beta.reduce((acc, curr, index) => acc + (curr * scenarioVector[index]), 0);
-      const HR = Math.exp(logHR);
-      const f0 = s0.map(s => (1 - s) * 100);
-      const f1 = f0.map((f, index) => f * Math.exp(logHR));
-      const riskResults = timePoints.map((time, index) => `Risk at ${time} years: ${f1[index].toFixed(2)}%`);
-      document.getElementById("mortality-risk-results").innerText = riskResults.join('\n');
+      document.getElementById("mortality-risk-results").innerText = "Mortality Risk: " + (mortalityRisk * 100).toFixed(2) + "%";
     }
 
-    function footerDescription(type) {
-      var buttons = document.querySelectorAll('.footer a');
-      for (var i = 0; i < buttons.length; i++) {
-        buttons[i].classList.remove('active');
-      }
-      document.querySelector('.button-' + type).classList.add('active');
+    function footerDescription(section) {
+      var modelInsightsDescription = document.getElementById("model-insights-description");
+      var discussionDescription = document.getElementById("discussion-description");
 
-      if (type === 'model') {
-        document.getElementById("discussion-description").style.display = 'none';
-        document.getElementById("model-insights-description").style.display = 'block';
-      } else {
-        document.getElementById("discussion-description").style.display = 'block';
-        document.getElementById("model-insights-description").style.display = 'none';
+      if (section === 'model') {
+        modelInsightsDescription.style.display = 'block';
+        discussionDescription.style.display = 'none';
+      } else if (section === 'discussion') {
+        modelInsightsDescription.style.display = 'none';
+        discussionDescription.style.display = 'block';
       }
     }
-
-    document.getElementById("expected-eGFRcr").style.display = 'none';
-    document.getElementById("predicted-creatinine").style.display = 'none';
-    document.getElementById("discussion-description").style.display = 'none';
-
-    document.getElementById("calculate-risk-button").addEventListener("click", calculateMortalityRisk);
   </script>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-f1Qa7shL8IGz4t5t5lzZkpvVST+apT4kAZFwJc/pNExtaW6Td06owWLLzsWoQJN8" crossorigin="anonymous"></script>
 </body>
 
 </html>
+
