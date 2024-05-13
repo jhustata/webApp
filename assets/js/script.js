@@ -19,9 +19,9 @@ function selectScenario(scenario) {
 }
 
 function calculateMortalityRisk() {
-  const beta = [/* Insert beta coefficients for each scenario here */];
-  const s0 = [0.99, 0.93, 0.86, 0.77, 0.71, 0.64, 0.56];
-  const timePoints = [0, 5, 10, 15, 20, 25, 30];
+  const beta = [0, 1.468284, 3.291419]; // Beta coefficients for living donors, healthy non-donors, general population
+  const s0 = [.9999999, .9949034, .9844462, .9792454]; // Survival probabilities at timepoints 0, 5, 12, 15
+  const timePoints = [0, 5, 12, 15];
   const logHR = beta.reduce((acc, curr, index) => acc + (curr * scenarioVector[index]), 0);
   const f0 = s0.map(s => (1 - s) * 100);
   const f1 = f0.map((f, index) => f * Math.exp(logHR));
