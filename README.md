@@ -12,6 +12,8 @@
 - We're going to use the betas and survival function to get the mortality risk at 0, 5, 12, and 15 years in living kidney donors
 - Once we've set it up well, we'll then include more complex scenarios than we have now
 - For now the scenarios are only three: donor, nondonor, general population
+- There are only two files to edit and develop: `assets/js/script.js` & `index.html`
+- No other file needs your attention
 
 ### Results
 
